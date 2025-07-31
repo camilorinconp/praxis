@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praxis English: Propuesta de Transformación IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Praxis Brand Colors (Deep Navy & Vibrant Orange) -->
+    <!-- Application Structure Plan: A dashboard-style SPA with thematic sections (Inicio, Diagnóstico, Oportunidad IA, Hoja de Ruta, Impacto) for non-linear exploration. Key interactions include a competitive analysis chart, an interactive roadmap timeline, and a filterable market segment chart to make the dense report data digestible and engaging for stakeholders. This structure prioritizes strategic understanding over report chronology. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification -> Library/Method. 1. Competitive Landscape -> Compare -> Bar Chart -> Hover for details -> Quickly show AI adoption gap -> Chart.js. 2. Implementation Plan -> Show Process -> Interactive Timeline -> Click to show phase details -> Simplify complex phased plan -> HTML/CSS/JS. 3. Market Segments -> Inform/Filter -> Donut Chart -> Click to filter content -> Connect client data to specific strategies -> Chart.js/JS. 4. Business Models -> Organize -> Accordions -> Click to expand -> Present detailed proposals cleanly -> HTML/JS. All choices support the dashboard structure and avoid information overload. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* blue-gray-50 */
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active {
+            color: #1E3A8A; /* navy-700 */
+            border-bottom-color: #F97316; /* orange-500 */
+            font-weight: 600;
+        }
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .phase-button {
+            position: relative;
+            z-index: 10;
+            width: 28%;
+            text-align: center;
+            font-weight: 500;
+            background-color: #F8FAFC; /* gray-50 */
+            border: 2px solid #E2E8F0; /* gray-200 */
+            border-radius: 9999px;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+        .phase-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .phase-button.active {
+            background-color: #1E3A8A; /* navy-700 */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .accordion-header {
+            transition: background-color 0.3s ease;
+        }
+        .accordion-header:hover {
+            background-color: #F1F5F9; /* blue-gray-100 */
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-2xl text-orange-500">Praxis<span class="font-light text-stone-600">English</span></span>
+                    <span class="ml-4 text-sm font-semibold text-orange-500 tracking-wide">/ Visión IA</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Inicio</a>
+                        <a href="#diagnostico" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Diagnóstico</a>
+                        <a href="#oportunidad" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Oportunidad IA</a>
+                        <a href="#hoja-de-ruta" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Hoja de Ruta</a>
+                        <a href="#impacto" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Impacto</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <!-- Section 1: Inicio -->
+        <section id="inicio" class="mb-16 scroll-mt-16">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-indigo-800 tracking-tight leading-tight">Transformación Estratégica con IA</h1>
+                <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">Una propuesta para posicionar a **Praxis English** como líder en educación de idiomas, combinando 30 años de excelencia pedagógica con la innovación de la inteligencia artificial.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="glass-card p-6 rounded-xl shadow-lg border border-white/20 hover:scale-105 transition-transform duration-300">
+                    <div class="text-5xl font-bold text-orange-500">30+</div>
+                    <p class="mt-2 text-stone-600">Años de Experiencia</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl shadow-lg border border-white/20 hover:scale-105 transition-transform duration-300">
+                    <div class="text-5xl font-bold text-orange-500">70%</div>
+                    <p class="mt-2 text-stone-600">Segmento Infantil</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl shadow-lg border border-white/20 hover:scale-105 transition-transform duration-300">
+                    <div class="text-5xl font-bold text-orange-500">IA</div>
+                    <p class="mt-2 text-stone-600">Ventaja Competitiva Clave</p>
+                </div>
+            </div>
+
+            <div class="mt-12 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                <h3 class="text-2xl font-bold text-center text-stone-800 mb-6">Pilares de la Transformación</h3>
+                <p class="text-center text-stone-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+                    Esta transformación se basa en tres pilares estratégicos que trabajan en conjunto para crear un ecosistema de aprendizaje superior. Cada pilar refuerza a los demás, desde la optimización del modelo actual hasta la creación de nuevas fuentes de valor y la capacitación de nuestro equipo para un futuro nativo en IA.
+                </p>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
+                    <div class="text-center p-4 rounded-lg w-full md:w-1/4 hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-4xl mb-2">🚀</div>
+                        <h4 class="font-semibold text-lg text-indigo-800">Mejorar el Modelo Actual</h4>
+                        <p class="text-sm text-stone-500">Potenciar la enseñanza con tutores IA y rutas personalizadas.</p>
+                    </div>
+                    <div class="text-2xl text-stone-400 font-light hidden md:block">+</div>
+                    <div class="text-center p-4 rounded-lg w-full md:w-1/4 hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-4xl mb-2">💡</div>
+                        <h4 class="font-semibold text-lg text-indigo-800">Nuevas Líneas de Negocio</h4>
+                        <p class="text-sm text-stone-500">Lanzar productos nativos de IA como apps de suscripción.</p>
+                    </div>
+                    <div class="text-2xl text-stone-400 font-light hidden md:block">+</div>
+                    <div class="text-center p-4 rounded-lg w-full md:w-1/4 hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-4xl mb-2">👥</div>
+                        <h4 class="font-semibold text-lg text-indigo-800">Personal AI-Native</h4>
+                        <p class="text-sm text-stone-500">Capacitar al equipo para maximizar el uso de la tecnología.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Diagnóstico -->
+        <section id="diagnostico" class="mb-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center mb-2">Diagnóstico Estratégico</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">Praxis English posee una base sólida, pero el mercado local muestra una brecha tecnológica significativa. Este análisis revela dónde estamos y dónde reside la oportunidad para liderar.</p>
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Praxis English: Hoy</h3>
+                    <p class="text-stone-600 mb-4 leading-relaxed">Con más de 30 años, Praxis se fundamenta en la filosofía "aprender practicando". Esta sólida base pedagógica, con clases dinámicas y un cuerpo docente calificado, es nuestra mayor fortaleza.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">✔</span><span>Metodología práctica y contextual probada.</span></li>
+                        <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">✔</span><span>Fuerte reputación y certificaciones de calidad.</span></li>
+                        <li class="flex items-start"><span class="text-amber-500 mr-3 mt-1">❗</span><span>Brecha en la adopción de tecnología avanzada (IA).</span></li>
+                        <li class="flex items-start"><span class="text-amber-500 mr-3 mt-1">❗</span><span>Digitalización actual básica (biblioteca virtual, soporte).</span></li>
+                    </ul>
+                    <p class="mt-6 text-sm italic text-indigo-800 bg-indigo-50 p-3 rounded-lg">La oportunidad no es cambiar nuestra filosofía, sino amplificarla y escalarla con IA.</p>
+                </div>
+                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Panorama Competitivo: Adopción de IA</h3>
+                     <p class="text-stone-600 mb-6 leading-relaxed">El análisis de competidores clave en Bucaramanga y su área metropolitana revela una adopción de IA muy limitada, creando una clara oportunidad para que Praxis se diferencie y lidere el mercado.</p>
+                    <div class="chart-container">
+                        <canvas id="competitorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Oportunidad IA -->
+        <section id="oportunidad" class="mb-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center mb-2">La Oportunidad de la IA</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">La inteligencia artificial nos permite evolucionar nuestro modelo de negocio de dos maneras complementarias: mejorando lo que ya hacemos excepcionalmente bien y creando nuevas fuentes de valor y crecimiento.</p>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Columna 1: Mejoras al Modelo Actual -->
+                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4 flex items-center"><span class="text-3xl mr-3">🚀</span>Mejoras al Modelo Actual</h3>
+                    <p class="text-stone-600 mb-6 leading-relaxed">Integrar IA para potenciar nuestra metodología, añadiendo personalización, eficiencia y disponibilidad 24/7.</p>
+                    <div class="space-y-4" id="accordion-mejoras">
+                        <div class="accordion-item border border-stone-200 rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
+                                <span>Tutores Conversacionales con IA</span>
+                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-stone-600 text-sm leading-relaxed">Implementar agentes de conversación para practicar inglés oral y escrito en cualquier momento, con correcciones en tiempo real sobre gramática y pronunciación. Esto aumenta la fluidez y libera tiempo de los profesores para tareas de mayor valor.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border border-stone-200 rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
+                                <span>Rutas de Aprendizaje Personalizadas</span>
+                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-stone-600 text-sm leading-relaxed">Desarrollar un sistema que evalúa el progreso del estudiante y ajusta dinámicamente el contenido y la dificultad. Esto acelera el aprendizaje y aumenta la motivación al ofrecer un camino educativo a medida.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border border-stone-200 rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
+                                <span>Corrección Automática de Tareas</span>
+                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-stone-600 text-sm leading-relaxed">Utilizar IA para la evaluación automática de tareas escritas y orales, proporcionando feedback instantáneo y detallado. Esto agiliza la retroalimentación para el estudiante y reduce la carga de trabajo repetitiva de los docentes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Nuevas Líneas de Negocio -->
+                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4 flex items-center"><span class="text-3xl mr-3">💡</span>Nuevas Líneas de Negocio</h3>
+                    <p class="text-stone-600 mb-6 leading-relaxed">Lanzar productos y servicios nativos de IA para diversificar ingresos y expandir nuestro alcance de mercado.</p>
+                    <div class="space-y-4" id="accordion-nuevas">
+                        <div class="accordion-item border border-stone-200 rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
+                                <span>App de Práctica por Suscripción</span>
+                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-stone-600 text-sm leading-relaxed">Crear una aplicación móvil/web independiente, bajo un modelo de suscripción, para practicar conversaciones con IA en escenarios simulados (entrevistas, viajes, negocios). Esto abre un nuevo flujo de ingresos escalable y expande nuestro alcance geográfico.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border border-stone-200 rounded-lg">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
+                                <span>Preparación para Exámenes con IA</span>
+                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-stone-600 text-sm leading-relaxed">Potenciar la preparación para TOEFL/IELTS con módulos de IA que ofrecen simulacros adaptativos, análisis de rendimiento detallado y evaluación automatizada de speaking/writing. Esto nos posiciona como líderes en preparación de alto nivel.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Hoja de Ruta -->
+        <section id="hoja-de-ruta" class="mb-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center mb-2">Hoja de Ruta de Implementación</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">Proponemos una implementación por fases para gestionar la complejidad, mitigar riesgos y construir capacidades internas de forma gradual y sostenible.</p>
+            
+            <div class="w-full max-w-4xl mx-auto">
+                <!-- Timeline Navigation -->
+                <div class="flex justify-between mb-8 relative">
+                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-stone-300 -translate-y-1/2"></div>
+                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-indigo-800 to-orange-500 transition-all duration-500" id="timeline-progress"></div>
+                    <div class="flex justify-between w-full">
+                        <button data-phase="1" class="phase-button z-10 w-28 text-center text-sm font-semibold py-2 transition-all duration-300">Fase 1<br>Básica</button>
+                        <button data-phase="2" class="phase-button z-10 w-28 text-center text-sm font-semibold py-2 transition-all duration-300">Fase 2<br>Intermedia</button>
+                        <button data-phase="3" class="phase-button z-10 w-28 text-center text-sm font-semibold py-2 transition-all duration-300">Fase 3<br>Avanzada</button>
+                    </div>
+                </div>
+
+                <!-- Timeline Content -->
+                <div id="timeline-content" class="glass-card p-8 rounded-xl shadow-lg transition-opacity duration-500 border border-white/20">
+                    <!-- Content will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Impacto -->
+        <section id="impacto" class="scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center mb-2">Impacto y Propuesta de Valor</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">La transformación no solo nos diferenciará de la competencia, sino que creará un valor sin precedentes para nuestros estudiantes, adaptando la tecnología a sus necesidades específicas.</p>
+
+            <div class="grid lg:grid-cols-5 gap-8">
+                <div class="lg:col-span-2 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Segmentos de Mercado</h3>
+                    <p class="text-stone-600 mb-6 leading-relaxed">Nuestra estrategia de IA se adapta a las necesidades únicas de nuestros dos segmentos clave, maximizando el engagement y la relevancia del aprendizaje.</p>
+                    <div class="chart-container h-64">
+                        <canvas id="segmentChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-3 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                    <div id="segment-details">
+                        <!-- Content will be injected by JS -->
+                    </div>
+                </div>
+            </div>
+             <div class="mt-8 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                <h3 class="text-2xl font-bold text-stone-800 mb-4 text-center">Ventaja Competitiva Sostenible</h3>
+                <p class="text-center text-stone-600 mb-8 max-w-3xl mx-auto leading-relaxed">El nuevo modelo híbrido de Praxis English será superior a las alternativas del mercado al combinar lo mejor de ambos mundos: la tecnología y la humanidad.</p>
+                <div class="grid md:grid-cols-3 gap-6 text-sm">
+                    <div class="bg-orange-50 p-4 rounded-lg border border-orange-200 hover:shadow-xl transition-shadow duration-300">
+                        <h4 class="font-bold text-orange-800">vs. Tradicionales</h4>
+                        <p class="text-orange-700 mt-1 leading-relaxed">Ofrecemos personalización 24/7 y práctica ilimitada que ellos no pueden escalar.</p>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 hover:shadow-xl transition-shadow duration-300">
+                        <h4 class="font-bold text-indigo-800">vs. Apps Online</h4>
+                        <p class="text-indigo-700 mt-1 leading-relaxed">Mantenemos la guía experta de profesores, el contexto cultural y una comunidad real.</p>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 hover:shadow-xl transition-shadow duration-300">
+                        <h4 class="font-bold text-amber-800">vs. IA Incipiente</h4>
+                        <p class="text-amber-700 mt-1 leading-relaxed">Implementamos una estrategia de IA más profunda y sistémica, no solo funcionalidades aisladas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-800 text-white mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-stone-400">
+            <p>Propuesta de Transformación Estratégica para Praxis English. &copy; 2025</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    
+    // --- Data ---
+    const competitorData = {
+        labels: ['Praxis (Actual)', 'Smart Academia', 'C. Colombo', 'Jamestown', 'Best English'],
+        datasets: [{
+            label: 'Nivel de Adopción de IA',
+            data: [1, 3, 0, 1, 0],
+            backgroundColor: [
+                'rgba(245, 158, 11, 0.6)', // amber-500
+                'rgba(249, 115, 22, 0.6)', // orange-500
+                'rgba(239, 68, 68, 0.6)', // red-500
+                'rgba(239, 68, 68, 0.6)',
+                'rgba(239, 68, 68, 0.6)',
+            ],
+            borderColor: [
+                'rgba(245, 158, 11, 1)',
+                'rgba(249, 115, 22, 1)',
+                'rgba(239, 68, 68, 1)',
+                'rgba(239, 68, 68, 1)',
+                'rgba(239, 68, 68, 1)',
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    const segmentData = {
+        labels: ['Niños (70%)', 'Jóvenes y Adultos (30%)'],
+        datasets: [{
+            data: [70, 30],
+            backgroundColor: ['#F97316', '#1E3A8A'], // orange-500, navy-700
+            hoverBackgroundColor: ['#EA580C', '#1E3A8A'],
+            borderColor: '#F1F5F9', // blue-gray-100
+            borderWidth: 4,
+        }]
+    };
+
+    const timelineData = {
+        1: {
+            title: "Fase 1: Integración Básica (6-12 meses)",
+            description: "El objetivo es adoptar herramientas de IA que complementen las operaciones existentes con una inversión y complejidad técnica moderadas, sentando las bases para una transformación más profunda.",
+            details: [
+                { title: "Tecnologías", content: "Integración de LLMs vía API, herramientas de corrección gramatical, plugins de IA para LMS.", icon: "💻" },
+                { title: "Capacidades", content: "Feedback básico de IA, chatbots de soporte, generación de ejercicios personalizados.", icon: "✨" },
+                { title: "Desafíos", content: "Recopilación de datos, selección de proveedores, resistencia al cambio.", icon: "🤔" },
+                { title: "Recursos", content: "Presupuesto para APIs, equipo de desarrollo básico, capacitación inicial de profesores.", icon: "💰" }
+            ]
+        },
+        2: {
+            title: "Fase 2: Mejora Intermedia (12-24 meses)",
+            description: "En esta fase, profundizamos en la personalización y la interactividad, desarrollando soluciones más sofisticadas que impacten directamente la experiencia de aprendizaje del estudiante.",
+            details: [
+                { title: "Tecnologías", content: "LangGraph para tutores conversacionales, motores de recomendación, LangSmith (monitoreo).", icon: "⚙️" },
+                { title: "Capacidades", content: "Rutas de aprendizaje adaptativas, cuentos interactivos para niños, práctica conversacional avanzada.", icon: "🚀" },
+                { title: "Desafíos", content: "Mayor complejidad técnica, creación de contenido pedagógico para IA, escalado de infraestructura.", icon: "🧠" },
+                { title: "Recursos", content: "Talento especializado en IA, presupuesto para contenido interactivo, infraestructura robusta.", icon: "👥" }
+            ]
+        },
+        3: {
+            title: "Fase 3: Transformación Avanzada (24-36+ meses)",
+            description: "Esta es la culminación de la visión, con una integración profunda de IA de vanguardia para crear una experiencia de aprendizaje inigualable y consolidar nuestro liderazgo en el mercado.",
+            details: [
+                { title: "Tecnologías", content: "Sistemas multi-agente, evaluación de IA integral, LangSmith (optimización), exploración de VR/AR.", icon: "🌌" },
+                { title: "Capacidades", content: "Simulaciones de alta fidelidad (entrevistas, negocios), entornos de inmersión, análisis predictivo.", icon: "🏆" },
+                { title: "Desafíos", content: "Inversión significativa en I+D, retención de talento de élite, gestión del cambio a gran escala, consideraciones éticas/privacidad, mantenimiento de relevancia tecnológica.", icon: "⚖️" },
+                { title: "Recursos", content: "Presupuesto sustancial para I+D, posibles alianzas estratégicas, equipo legal (privacidad), equipo de gestión de proyectos de transformación.", icon: "🤝" }
+            ]
+        }
+    };
+
+    const segmentDetailsData = {
+        0: {
+            title: "Estrategia para Niños (70%)",
+            description: "El aprendizaje se enfoca en ser lúdico, interactivo y altamente motivador, utilizando la IA para crear un entorno de inmersión divertido y seguro.",
+            features: [
+                { title: "Gamificación", content: "Sistemas de puntos, insignias y recompensas para mantener el interés y la motivación.", icon: "🎮" },
+                { title: "Cuentos Interactivos", content: "Historias generadas por IA que se adaptan a las decisiones y nivel del niño.", icon: "📖" },
+                { title: "Avatares Amigables", content: "Compañeros de aprendizaje virtuales que guían, animan y explican.", icon: "🤖" }
+            ]
+        },
+        1: {
+            title: "Estrategia para Jóvenes y Adultos (30%)",
+            description: "Para este segmento, la IA se enfoca en desarrollar habilidades pragmáticas y directamente aplicables a objetivos profesionales y personales.",
+            features: [
+                { title: "Práctica de Entrevistas", content: "Simulaciones realistas de entrevistas de trabajo con feedback instantáneo sobre fluidez y vocabulario.", icon: "👔" },
+                { title: "Inglés de Negocios", content: "Módulos dedicados a escenarios empresariales: reuniones, presentaciones y negociaciones.", icon: "📈" },
+                { title: "Role-Playing Profesional", content: "Interacción con IA en contextos de atención al cliente, ventas o discusiones técnicas.", icon: "🗣️" }
+            ]
+        }
+    };
+
+    // --- Chart.js Instances ---
+    const ctxCompetitor = document.getElementById('competitorChart').getContext('2d');
+    new Chart(ctxCompetitor, {
+        type: 'bar',
+        data: competitorData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            const labels = ['Ninguna', 'Básica', 'Intermedia', 'Avanzada'];
+                            return labels[value] || '';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Nivel de Adopción'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const labels = ['Ninguna', 'Básica (Soporte/Digital)', 'Intermedia (Funcionalidades IA)', 'Avanzada (Ecosistema IA)'];
+                            return 'Nivel: ' + labels[context.raw];
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const ctxSegment = document.getElementById('segmentChart').getContext('2d');
+    const segmentChart = new Chart(ctxSegment, {
+        type: 'doughnut',
+        data: segmentData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ` ${context.label}: ${context.raw}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // --- Interactivity ---
+
+    // Accordions
+    function setupAccordion(containerId) {
+        const accordionContainer = document.getElementById(containerId);
+        if(accordionContainer) {
+            const headers = accordionContainer.querySelectorAll('.accordion-header');
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.accordion-icon');
+                    
+                    // Close all other accordions in the same group
+                    headers.forEach(otherHeader => {
+                        if (otherHeader !== header) {
+                            otherHeader.nextElementSibling.style.maxHeight = null;
+                            otherHeader.querySelector('.accordion-icon').textContent = '+';
+                            otherHeader.querySelector('.accordion-icon').classList.remove('rotate-45');
+                        }
+                    });
+
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.textContent = '+';
+                        icon.classList.remove('rotate-45');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.textContent = '-';
+                        icon.classList.add('rotate-45');
+                    }
+                });
+            });
+        }
+    }
+    setupAccordion('accordion-mejoras');
+    setupAccordion('accordion-nuevas');
+
+    // Timeline
+    const phaseButtons = document.querySelectorAll('.phase-button');
+    const timelineContent = document.getElementById('timeline-content');
+    const timelineProgress = document.getElementById('timeline-progress');
+
+    function updateTimeline(phase) {
+        phaseButtons.forEach(btn => btn.classList.remove('active'));
+        const activeButton = document.querySelector(`.phase-button[data-phase='${phase}']`);
+        activeButton.classList.add('active');
+
+        const data = timelineData[phase];
+        timelineContent.style.opacity = 0;
+        
+        setTimeout(() => {
+            timelineContent.innerHTML = `
+                <h4 class="text-xl font-bold text-indigo-800 mb-2">${data.title}</h4>
+                <p class="text-stone-600 mb-6 leading-relaxed">${data.description}</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    ${data.details.map(item => `
+                        <div class="bg-stone-100 p-4 rounded-lg">
+                            <h5 class="font-semibold text-stone-800 flex items-center"><span class="text-xl mr-2">${item.icon}</span>${item.title}</h5>
+                            <p class="text-sm text-stone-600 mt-1 leading-relaxed">${item.content}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            timelineContent.style.opacity = 1;
+        }, 300);
+
+        const progressPercentage = (phase - 1) * 50;
+        timelineProgress.style.width = `${progressPercentage}%`;
+    }
+
+    phaseButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            updateTimeline(button.dataset.phase);
+        });
+    });
+
+    // Segment Details
+    const segmentDetailsContainer = document.getElementById('segment-details');
+
+    function updateSegmentDetails(segmentIndex) {
+        const data = segmentDetailsData[segmentIndex];
+        segmentDetailsContainer.innerHTML = `
+            <h3 class="text-2xl font-bold text-stone-800 mb-4">${data.title}</h3>
+            <p class="text-stone-600 mb-6 leading-relaxed">${data.description}</p>
+            <div class="space-y-4">
+                ${data.features.map(feature => `
+                    <div class="flex items-start">
+                        <div class="bg-indigo-100 text-indigo-800 rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center mr-4 text-2xl">${feature.icon}</div>
+                        <div>
+                            <h4 class="font-semibold text-stone-800">${feature.title}</h4>
+                            <p class="text-sm text-stone-600 leading-relaxed">${feature.content}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    document.getElementById('segmentChart').onclick = function(evt) {
+        const activePoints = segmentChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+        if (activePoints.length) {
+            const firstPoint = activePoints[0];
+            const index = firstPoint.index;
+            updateSegmentDetails(index);
+        }
+    };
+
+    // Navigation scroll highlighting
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 80) { // 80 is header height + buffer
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Initial state
+    updateTimeline(1);
+    updateSegmentDetails(0);
+    document.querySelector('.nav-link[href="#inicio"]').classList.add('active');
+
+});
+</script>
+</body>
+</html>
