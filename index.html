@@ -9,28 +9,50 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Praxis Brand Colors (Deep Navy & Vibrant Orange) -->
-    <!-- Application Structure Plan: A dashboard-style SPA with thematic sections (Inicio, Diagnóstico, Oportunidad IA, Hoja de Ruta, Impacto) for non-linear exploration. Key interactions include a competitive analysis chart, an interactive roadmap timeline, and a filterable market segment chart to make the dense report data digestible and engaging for stakeholders. This structure prioritizes strategic understanding over report chronology. -->
-    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification -> Library/Method. 1. Competitive Landscape -> Compare -> Bar Chart -> Hover for details -> Quickly show AI adoption gap -> Chart.js. 2. Implementation Plan -> Show Process -> Interactive Timeline -> Click to show phase details -> Simplify complex phased plan -> HTML/CSS/JS. 3. Market Segments -> Inform/Filter -> Donut Chart -> Click to filter content -> Connect client data to specific strategies -> Chart.js/JS. 4. Business Models -> Organize -> Accordions -> Click to expand -> Present detailed proposals cleanly -> HTML/JS. All choices support the dashboard structure and avoid information overload. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'praxis-lime': '#84cc16',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* blue-gray-50 */
+            background-color: #f5f5f4; /* stone-100 */
         }
         .nav-link {
             transition: color 0.3s, border-bottom-color 0.3s;
         }
         .nav-link.active {
-            color: #1E3A8A; /* navy-700 */
-            border-bottom-color: #F97316; /* orange-500 */
+            color: #84cc16; /* praxis-lime */
+            border-bottom-color: #84cc16; /* praxis-lime */
             font-weight: 600;
         }
-        .glass-card {
-            background-color: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        .styled-card {
+            background-color: white;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* shadow-md */
+            transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .styled-card:hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-lg */
+            border-color: #84cc16; /* praxis-lime */
+        }
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s cubic-bezier(0.645, 0.045, 0.355, 1),
+                        transform 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         .chart-container {
             position: relative;
@@ -49,11 +71,11 @@
         .phase-button {
             position: relative;
             z-index: 10;
-            width: 28%;
             text-align: center;
-            font-weight: 500;
-            background-color: #F8FAFC; /* gray-50 */
-            border: 2px solid #E2E8F0; /* gray-200 */
+            font-weight: 600;
+            color: #57534e; /* stone-600 */
+            background-color: #ffffff; /* white */
+            border: 2px solid #e7e5e4; /* stone-200 */
             border-radius: 9999px;
             padding-top: 0.5rem;
             padding-bottom: 0.5rem;
@@ -62,11 +84,13 @@
         }
         .phase-button:hover {
             transform: translateY(-2px);
+            border-color: #84cc16;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
         .phase-button.active {
-            background-color: #1E3A8A; /* navy-700 */
-            color: white;
+            background-color: #84cc16; /* praxis-lime */
+            color: #1c1917; /* stone-900 */
+            border-color: #84cc16;
             transform: translateY(-2px);
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
@@ -79,31 +103,55 @@
             transition: background-color 0.3s ease;
         }
         .accordion-header:hover {
-            background-color: #F1F5F9; /* blue-gray-100 */
+            background-color: #f5f5f4; /* stone-100 */
         }
     </style>
 </head>
 <body class="text-stone-800">
 
     <!-- Header & Navigation -->
-    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+    <header class="bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <span class="font-bold text-2xl text-orange-500">Praxis<span class="font-light text-stone-600">English</span></span>
-                    <span class="ml-4 text-sm font-semibold text-orange-500 tracking-wide">/ Visión IA</span>
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="font-bold text-2xl text-praxis-lime">Praxis<span class="font-light text-stone-600">English</span></span>
+                    <span class="ml-4 text-sm font-semibold text-praxis-lime tracking-wide hidden sm:block">/ Visión IA</span>
                 </div>
+                <!-- Desktop Menu -->
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#inicio" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Inicio</a>
-                        <a href="#diagnostico" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Diagnóstico</a>
-                        <a href="#oportunidad" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Oportunidad IA</a>
-                        <a href="#hoja-de-ruta" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Hoja de Ruta</a>
-                        <a href="#impacto" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-500 border-b-2 border-transparent">Impacto</a>
+                        <a href="#inicio" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-praxis-lime border-b-2 border-transparent">Inicio</a>
+                        <a href="#diagnostico" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-praxis-lime border-b-2 border-transparent">Diagnóstico</a>
+                        <a href="#oportunidad" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-praxis-lime border-b-2 border-transparent">Oportunidad IA</a>
+                        <a href="#hoja-de-ruta" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-praxis-lime border-b-2 border-transparent">Hoja de Ruta</a>
+                        <a href="#impacto" class="nav-link px-3 py-2 text-sm font-medium text-stone-600 hover:text-praxis-lime border-b-2 border-transparent">Impacto</a>
                     </div>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button id="menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-stone-600 hover:text-praxis-lime hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-praxis-lime" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg id="menu-icon-open" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="menu-icon-close" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </nav>
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-600 hover:text-praxis-lime hover:bg-stone-100">Inicio</a>
+                <a href="#diagnostico" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-600 hover:text-praxis-lime hover:bg-stone-100">Diagnóstico</a>
+                <a href="#oportunidad" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-600 hover:text-praxis-lime hover:bg-stone-100">Oportunidad IA</a>
+                <a href="#hoja-de-ruta" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-600 hover:text-praxis-lime hover:bg-stone-100">Hoja de Ruta</a>
+                <a href="#impacto" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-600 hover:text-praxis-lime hover:bg-stone-100">Impacto</a>
+            </div>
+        </div>
     </header>
 
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -111,46 +159,52 @@
         <!-- Section 1: Inicio -->
         <section id="inicio" class="mb-16 scroll-mt-16">
             <div class="text-center mb-12">
-                <h1 class="text-4xl md:text-5xl font-bold text-indigo-800 tracking-tight leading-tight">Transformación Estratégica con IA</h1>
-                <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">Una propuesta para posicionar a **Praxis English** como líder en educación de idiomas, combinando 30 años de excelencia pedagógica con la innovación de la inteligencia artificial.</p>
+                <h1 class="text-4xl sm:text-5xl font-bold text-stone-800 tracking-tight leading-tight fade-in-up">Transformación Estratégica con IA</h1>
+                <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto fade-in-up" style="transition-delay: 100ms;">Una propuesta para posicionar a **Praxis English** como líder en educación de idiomas, combinando 30 años de excelencia pedagógica con la innovación de la inteligencia artificial.</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8 text-center">
-                <div class="glass-card p-6 rounded-xl shadow-lg border border-white/20 hover:scale-105 transition-transform duration-300">
-                    <div class="text-5xl font-bold text-orange-500">30+</div>
+                <div class="styled-card p-6 fade-in-up">
+                    <div class="text-5xl font-bold text-praxis-lime">30+</div>
                     <p class="mt-2 text-stone-600">Años de Experiencia</p>
                 </div>
-                <div class="glass-card p-6 rounded-xl shadow-lg border border-white/20 hover:scale-105 transition-transform duration-300">
-                    <div class="text-5xl font-bold text-orange-500">70%</div>
+                <div class="styled-card p-6 fade-in-up" style="transition-delay: 100ms;">
+                    <div class="text-5xl font-bold text-praxis-lime">70%</div>
                     <p class="mt-2 text-stone-600">Segmento Infantil</p>
                 </div>
-                <div class="glass-card p-6 rounded-xl shadow-lg border border-white/20 hover:scale-105 transition-transform duration-300">
-                    <div class="text-5xl font-bold text-orange-500">IA</div>
+                <div class="styled-card p-6 fade-in-up" style="transition-delay: 200ms;">
+                    <div class="text-5xl font-bold text-praxis-lime">IA</div>
                     <p class="mt-2 text-stone-600">Ventaja Competitiva Clave</p>
                 </div>
             </div>
 
-            <div class="mt-12 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+            <div class="mt-12 styled-card p-8 fade-in-up" style="transition-delay: 300ms;">
                 <h3 class="text-2xl font-bold text-center text-stone-800 mb-6">Pilares de la Transformación</h3>
                 <p class="text-center text-stone-600 mb-8 max-w-2xl mx-auto leading-relaxed">
                     Esta transformación se basa en tres pilares estratégicos que trabajan en conjunto para crear un ecosistema de aprendizaje superior. Cada pilar refuerza a los demás, desde la optimización del modelo actual hasta la creación de nuevas fuentes de valor y la capacitación de nuestro equipo para un futuro nativo en IA.
                 </p>
                 <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
-                    <div class="text-center p-4 rounded-lg w-full md:w-1/4 hover:shadow-lg transition-shadow duration-300">
-                        <div class="text-4xl mb-2">🚀</div>
-                        <h4 class="font-semibold text-lg text-indigo-800">Mejorar el Modelo Actual</h4>
+                    <div class="text-center p-4 rounded-lg w-full md:w-1/4">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-lime-100 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-praxis-lime"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        </div>
+                        <h4 class="font-semibold text-lg text-stone-800">Mejorar el Modelo Actual</h4>
                         <p class="text-sm text-stone-500">Potenciar la enseñanza con tutores IA y rutas personalizadas.</p>
                     </div>
-                    <div class="text-2xl text-stone-400 font-light hidden md:block">+</div>
-                    <div class="text-center p-4 rounded-lg w-full md:w-1/4 hover:shadow-lg transition-shadow duration-300">
-                        <div class="text-4xl mb-2">💡</div>
-                        <h4 class="font-semibold text-lg text-indigo-800">Nuevas Líneas de Negocio</h4>
+                    <div class="text-2xl text-stone-300 font-light hidden md:block">+</div>
+                    <div class="text-center p-4 rounded-lg w-full md:w-1/4">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-lime-100 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-praxis-lime"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        </div>
+                        <h4 class="font-semibold text-lg text-stone-800">Nuevas Líneas de Negocio</h4>
                         <p class="text-sm text-stone-500">Lanzar productos nativos de IA como apps de suscripción.</p>
                     </div>
-                    <div class="text-2xl text-stone-400 font-light hidden md:block">+</div>
-                    <div class="text-center p-4 rounded-lg w-full md:w-1/4 hover:shadow-lg transition-shadow duration-300">
-                        <div class="text-4xl mb-2">👥</div>
-                        <h4 class="font-semibold text-lg text-indigo-800">Personal AI-Native</h4>
+                    <div class="text-2xl text-stone-300 font-light hidden md:block">+</div>
+                    <div class="text-center p-4 rounded-lg w-full md:w-1/4">
+                        <div class="w-16 h-16 mx-auto mb-4 bg-lime-100 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-praxis-lime"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </div>
+                        <h4 class="font-semibold text-lg text-stone-800">Personal AI-Native</h4>
                         <p class="text-sm text-stone-500">Capacitar al equipo para maximizar el uso de la tecnología.</p>
                     </div>
                 </div>
@@ -159,22 +213,22 @@
 
         <!-- Section 2: Diagnóstico -->
         <section id="diagnostico" class="mb-16 scroll-mt-16">
-            <h2 class="text-3xl font-bold text-center mb-2">Diagnóstico Estratégico</h2>
-            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">Praxis English posee una base sólida, pero el mercado local muestra una brecha tecnológica significativa. Este análisis revela dónde estamos y dónde reside la oportunidad para liderar.</p>
+            <h2 class="text-3xl font-bold text-center mb-2 fade-in-up">Diagnóstico Estratégico</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed fade-in-up" style="transition-delay: 100ms;">Praxis English posee una base sólida, pero el mercado local muestra una brecha tecnológica significativa. Este análisis revela dónde estamos y dónde reside la oportunidad para liderar.</p>
             
             <div class="grid lg:grid-cols-2 gap-8">
-                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                <div class="styled-card p-8 fade-in-up" style="transition-delay: 200ms;">
                     <h3 class="text-2xl font-bold text-stone-800 mb-4">Praxis English: Hoy</h3>
                     <p class="text-stone-600 mb-4 leading-relaxed">Con más de 30 años, Praxis se fundamenta en la filosofía "aprender practicando". Esta sólida base pedagógica, con clases dinámicas y un cuerpo docente calificado, es nuestra mayor fortaleza.</p>
                     <ul class="space-y-3">
-                        <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">✔</span><span>Metodología práctica y contextual probada.</span></li>
-                        <li class="flex items-start"><span class="text-orange-500 mr-3 mt-1">✔</span><span>Fuerte reputación y certificaciones de calidad.</span></li>
+                        <li class="flex items-start"><span class="text-praxis-lime mr-3 mt-1">✔</span><span>Metodología práctica y contextual probada.</span></li>
+                        <li class="flex items-start"><span class="text-praxis-lime mr-3 mt-1">✔</span><span>Fuerte reputación y certificaciones de calidad.</span></li>
                         <li class="flex items-start"><span class="text-amber-500 mr-3 mt-1">❗</span><span>Brecha en la adopción de tecnología avanzada (IA).</span></li>
                         <li class="flex items-start"><span class="text-amber-500 mr-3 mt-1">❗</span><span>Digitalización actual básica (biblioteca virtual, soporte).</span></li>
                     </ul>
-                    <p class="mt-6 text-sm italic text-indigo-800 bg-indigo-50 p-3 rounded-lg">La oportunidad no es cambiar nuestra filosofía, sino amplificarla y escalarla con IA.</p>
+                    <p class="mt-6 text-sm italic text-stone-800 bg-stone-100 p-3 rounded-lg">La oportunidad no es cambiar nuestra filosofía, sino amplificarla y escalarla con IA.</p>
                 </div>
-                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                <div class="styled-card p-8 fade-in-up" style="transition-delay: 300ms;">
                     <h3 class="text-2xl font-bold text-stone-800 mb-4">Panorama Competitivo: Adopción de IA</h3>
                      <p class="text-stone-600 mb-6 leading-relaxed">El análisis de competidores clave en Bucaramanga y su área metropolitana revela una adopción de IA muy limitada, creando una clara oportunidad para que Praxis se diferencie y lidere el mercado.</p>
                     <div class="chart-container">
@@ -186,19 +240,22 @@
 
         <!-- Section 3: Oportunidad IA -->
         <section id="oportunidad" class="mb-16 scroll-mt-16">
-            <h2 class="text-3xl font-bold text-center mb-2">La Oportunidad de la IA</h2>
-            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">La inteligencia artificial nos permite evolucionar nuestro modelo de negocio de dos maneras complementarias: mejorando lo que ya hacemos excepcionalmente bien y creando nuevas fuentes de valor y crecimiento.</p>
+            <h2 class="text-3xl font-bold text-center mb-2 fade-in-up">La Oportunidad de la IA</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed fade-in-up" style="transition-delay: 100ms;">La inteligencia artificial nos permite evolucionar nuestro modelo de negocio de dos maneras complementarias: mejorando lo que ya hacemos excepcionalmente bien y creando nuevas fuentes de valor y crecimiento.</p>
 
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Columna 1: Mejoras al Modelo Actual -->
-                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
-                    <h3 class="text-2xl font-bold text-stone-800 mb-4 flex items-center"><span class="text-3xl mr-3">🚀</span>Mejoras al Modelo Actual</h3>
+                <div class="styled-card p-8 fade-in-up" style="transition-delay: 200ms;">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 text-praxis-lime"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        Mejoras al Modelo Actual
+                    </h3>
                     <p class="text-stone-600 mb-6 leading-relaxed">Integrar IA para potenciar nuestra metodología, añadiendo personalización, eficiencia y disponibilidad 24/7.</p>
                     <div class="space-y-4" id="accordion-mejoras">
                         <div class="accordion-item border border-stone-200 rounded-lg">
                             <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
                                 <span>Tutores Conversacionales con IA</span>
-                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                                <span class="accordion-icon text-praxis-lime text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
                             </button>
                             <div class="accordion-content">
                                 <p class="p-4 text-stone-600 text-sm leading-relaxed">Implementar agentes de conversación para practicar inglés oral y escrito en cualquier momento, con correcciones en tiempo real sobre gramática y pronunciación. Esto aumenta la fluidez y libera tiempo de los profesores para tareas de mayor valor.</p>
@@ -207,7 +264,7 @@
                         <div class="accordion-item border border-stone-200 rounded-lg">
                             <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
                                 <span>Rutas de Aprendizaje Personalizadas</span>
-                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                                <span class="accordion-icon text-praxis-lime text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
                             </button>
                             <div class="accordion-content">
                                 <p class="p-4 text-stone-600 text-sm leading-relaxed">Desarrollar un sistema que evalúa el progreso del estudiante y ajusta dinámicamente el contenido y la dificultad. Esto acelera el aprendizaje y aumenta la motivación al ofrecer un camino educativo a medida.</p>
@@ -216,7 +273,7 @@
                         <div class="accordion-item border border-stone-200 rounded-lg">
                             <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
                                 <span>Corrección Automática de Tareas</span>
-                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                                <span class="accordion-icon text-praxis-lime text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
                             </button>
                             <div class="accordion-content">
                                 <p class="p-4 text-stone-600 text-sm leading-relaxed">Utilizar IA para la evaluación automática de tareas escritas y orales, proporcionando feedback instantáneo y detallado. Esto agiliza la retroalimentación para el estudiante y reduce la carga de trabajo repetitiva de los docentes.</p>
@@ -226,14 +283,17 @@
                 </div>
 
                 <!-- Columna 2: Nuevas Líneas de Negocio -->
-                <div class="glass-card p-8 rounded-xl shadow-lg border border-white/20">
-                    <h3 class="text-2xl font-bold text-stone-800 mb-4 flex items-center"><span class="text-3xl mr-3">💡</span>Nuevas Líneas de Negocio</h3>
+                <div class="styled-card p-8 fade-in-up" style="transition-delay: 300ms;">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 text-praxis-lime"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        Nuevas Líneas de Negocio
+                    </h3>
                     <p class="text-stone-600 mb-6 leading-relaxed">Lanzar productos y servicios nativos de IA para diversificar ingresos y expandir nuestro alcance de mercado.</p>
                     <div class="space-y-4" id="accordion-nuevas">
                         <div class="accordion-item border border-stone-200 rounded-lg">
                             <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
                                 <span>App de Práctica por Suscripción</span>
-                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                                <span class="accordion-icon text-praxis-lime text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
                             </button>
                             <div class="accordion-content">
                                 <p class="p-4 text-stone-600 text-sm leading-relaxed">Crear una aplicación móvil/web independiente, bajo un modelo de suscripción, para practicar conversaciones con IA en escenarios simulados (entrevistas, viajes, negocios). Esto abre un nuevo flujo de ingresos escalable y expande nuestro alcance geográfico.</p>
@@ -242,7 +302,7 @@
                         <div class="accordion-item border border-stone-200 rounded-lg">
                             <button class="accordion-header w-full text-left p-4 font-semibold text-stone-700 flex justify-between items-center bg-stone-50 hover:bg-stone-100 rounded-lg focus:outline-none">
                                 <span>Preparación para Exámenes con IA</span>
-                                <span class="accordion-icon text-orange-500 text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
+                                <span class="accordion-icon text-praxis-lime text-xl font-bold transition-transform duration-300 transform rotate-0">+</span>
                             </button>
                             <div class="accordion-content">
                                 <p class="p-4 text-stone-600 text-sm leading-relaxed">Potenciar la preparación para TOEFL/IELTS con módulos de IA que ofrecen simulacros adaptativos, análisis de rendimiento detallado y evaluación automatizada de speaking/writing. Esto nos posiciona como líderes en preparación de alto nivel.</p>
@@ -255,23 +315,23 @@
 
         <!-- Section 4: Hoja de Ruta -->
         <section id="hoja-de-ruta" class="mb-16 scroll-mt-16">
-            <h2 class="text-3xl font-bold text-center mb-2">Hoja de Ruta de Implementación</h2>
-            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">Proponemos una implementación por fases para gestionar la complejidad, mitigar riesgos y construir capacidades internas de forma gradual y sostenible.</p>
+            <h2 class="text-3xl font-bold text-center mb-2 fade-in-up">Hoja de Ruta de Implementación</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed fade-in-up" style="transition-delay: 100ms;">Proponemos una implementación por fases para gestionar la complejidad, mitigar riesgos y construir capacidades internas de forma gradual y sostenible.</p>
             
-            <div class="w-full max-w-4xl mx-auto">
+            <div class="w-full max-w-4xl mx-auto fade-in-up" style="transition-delay: 200ms;">
                 <!-- Timeline Navigation -->
                 <div class="flex justify-between mb-8 relative">
                     <div class="absolute top-1/2 left-0 w-full h-0.5 bg-stone-300 -translate-y-1/2"></div>
-                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-indigo-800 to-orange-500 transition-all duration-500" id="timeline-progress"></div>
-                    <div class="flex justify-between w-full">
-                        <button data-phase="1" class="phase-button z-10 w-28 text-center text-sm font-semibold py-2 transition-all duration-300">Fase 1<br>Básica</button>
-                        <button data-phase="2" class="phase-button z-10 w-28 text-center text-sm font-semibold py-2 transition-all duration-300">Fase 2<br>Intermedia</button>
-                        <button data-phase="3" class="phase-button z-10 w-28 text-center text-sm font-semibold py-2 transition-all duration-300">Fase 3<br>Avanzada</button>
+                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-praxis-lime transition-all duration-500" id="timeline-progress" style="width: 0%;"></div>
+                    <div class="flex justify-between w-full gap-2 sm:gap-4">
+                        <button data-phase="1" class="phase-button flex-1">Fase 1<br><span class="hidden sm:inline">Básica</span></button>
+                        <button data-phase="2" class="phase-button flex-1">Fase 2<br><span class="hidden sm:inline">Intermedia</span></button>
+                        <button data-phase="3" class="phase-button flex-1">Fase 3<br><span class="hidden sm:inline">Avanzada</span></button>
                     </div>
                 </div>
 
                 <!-- Timeline Content -->
-                <div id="timeline-content" class="glass-card p-8 rounded-xl shadow-lg transition-opacity duration-500 border border-white/20">
+                <div id="timeline-content" class="styled-card p-8 transition-opacity duration-500">
                     <!-- Content will be injected by JS -->
                 </div>
             </div>
@@ -279,34 +339,34 @@
 
         <!-- Section 5: Impacto -->
         <section id="impacto" class="scroll-mt-16">
-            <h2 class="text-3xl font-bold text-center mb-2">Impacto y Propuesta de Valor</h2>
-            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed">La transformación no solo nos diferenciará de la competencia, sino que creará un valor sin precedentes para nuestros estudiantes, adaptando la tecnología a sus necesidades específicas.</p>
+            <h2 class="text-3xl font-bold text-center mb-2 fade-in-up">Impacto y Propuesta de Valor</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-3xl mx-auto leading-relaxed fade-in-up" style="transition-delay: 100ms;">La transformación no solo nos diferenciará de la competencia, sino que creará un valor sin precedentes para nuestros estudiantes, adaptando la tecnología a sus necesidades específicas.</p>
 
             <div class="grid lg:grid-cols-5 gap-8">
-                <div class="lg:col-span-2 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                <div class="lg:col-span-2 styled-card p-8 fade-in-up" style="transition-delay: 200ms;">
                     <h3 class="text-2xl font-bold text-stone-800 mb-4">Segmentos de Mercado</h3>
                     <p class="text-stone-600 mb-6 leading-relaxed">Nuestra estrategia de IA se adapta a las necesidades únicas de nuestros dos segmentos clave, maximizando el engagement y la relevancia del aprendizaje.</p>
                     <div class="chart-container h-64">
                         <canvas id="segmentChart"></canvas>
                     </div>
                 </div>
-                <div class="lg:col-span-3 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+                <div class="lg:col-span-3 styled-card p-8 fade-in-up" style="transition-delay: 300ms;">
                     <div id="segment-details">
                         <!-- Content will be injected by JS -->
                     </div>
                 </div>
             </div>
-             <div class="mt-8 glass-card p-8 rounded-xl shadow-lg border border-white/20">
+             <div class="mt-8 styled-card p-8 fade-in-up" style="transition-delay: 400ms;">
                 <h3 class="text-2xl font-bold text-stone-800 mb-4 text-center">Ventaja Competitiva Sostenible</h3>
                 <p class="text-center text-stone-600 mb-8 max-w-3xl mx-auto leading-relaxed">El nuevo modelo híbrido de Praxis English será superior a las alternativas del mercado al combinar lo mejor de ambos mundos: la tecnología y la humanidad.</p>
                 <div class="grid md:grid-cols-3 gap-6 text-sm">
-                    <div class="bg-orange-50 p-4 rounded-lg border border-orange-200 hover:shadow-xl transition-shadow duration-300">
-                        <h4 class="font-bold text-orange-800">vs. Tradicionales</h4>
-                        <p class="text-orange-700 mt-1 leading-relaxed">Ofrecemos personalización 24/7 y práctica ilimitada que ellos no pueden escalar.</p>
+                    <div class="bg-lime-50 p-4 rounded-lg border border-lime-200 hover:shadow-xl transition-shadow duration-300">
+                        <h4 class="font-bold text-lime-800">vs. Tradicionales</h4>
+                        <p class="text-lime-700 mt-1 leading-relaxed">Ofrecemos personalización 24/7 y práctica ilimitada que ellos no pueden escalar.</p>
                     </div>
-                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 hover:shadow-xl transition-shadow duration-300">
-                        <h4 class="font-bold text-indigo-800">vs. Apps Online</h4>
-                        <p class="text-indigo-700 mt-1 leading-relaxed">Mantenemos la guía experta de profesores, el contexto cultural y una comunidad real.</p>
+                    <div class="bg-stone-200 p-4 rounded-lg border border-stone-300 hover:shadow-xl transition-shadow duration-300">
+                        <h4 class="font-bold text-stone-800">vs. Apps Online</h4>
+                        <p class="text-stone-700 mt-1 leading-relaxed">Mantenemos la guía experta de profesores, el contexto cultural y una comunidad real.</p>
                     </div>
                     <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 hover:shadow-xl transition-shadow duration-300">
                         <h4 class="font-bold text-amber-800">vs. IA Incipiente</h4>
@@ -335,14 +395,14 @@ document.addEventListener('DOMContentLoaded', function () {
             data: [1, 3, 0, 1, 0],
             backgroundColor: [
                 'rgba(245, 158, 11, 0.6)', // amber-500
-                'rgba(249, 115, 22, 0.6)', // orange-500
-                'rgba(239, 68, 68, 0.6)', // red-500
+                'rgba(132, 204, 22, 0.6)', // praxis-lime
+                'rgba(239, 68, 68, 0.6)',  // red-500
                 'rgba(239, 68, 68, 0.6)',
                 'rgba(239, 68, 68, 0.6)',
             ],
             borderColor: [
                 'rgba(245, 158, 11, 1)',
-                'rgba(249, 115, 22, 1)',
+                'rgba(132, 204, 22, 1)',
                 'rgba(239, 68, 68, 1)',
                 'rgba(239, 68, 68, 1)',
                 'rgba(239, 68, 68, 1)',
@@ -355,9 +415,9 @@ document.addEventListener('DOMContentLoaded', function () {
         labels: ['Niños (70%)', 'Jóvenes y Adultos (30%)'],
         datasets: [{
             data: [70, 30],
-            backgroundColor: ['#F97316', '#1E3A8A'], // orange-500, navy-700
-            hoverBackgroundColor: ['#EA580C', '#1E3A8A'],
-            borderColor: '#F1F5F9', // blue-gray-100
+            backgroundColor: ['#84cc16', '#292524'], // praxis-lime, stone-800
+            hoverBackgroundColor: ['#a3e635', '#44403c'], // lime-400, stone-700
+            borderColor: '#ffffff', // white
             borderWidth: 4,
         }]
     };
@@ -491,7 +551,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     const content = header.nextElementSibling;
                     const icon = header.querySelector('.accordion-icon');
                     
-                    // Close all other accordions in the same group
                     headers.forEach(otherHeader => {
                         if (otherHeader !== header) {
                             otherHeader.nextElementSibling.style.maxHeight = null;
@@ -531,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         setTimeout(() => {
             timelineContent.innerHTML = `
-                <h4 class="text-xl font-bold text-indigo-800 mb-2">${data.title}</h4>
+                <h4 class="text-xl font-bold text-stone-800 mb-2">${data.title}</h4>
                 <p class="text-stone-600 mb-6 leading-relaxed">${data.description}</p>
                 <div class="grid md:grid-cols-2 gap-4">
                     ${data.details.map(item => `
@@ -566,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="space-y-4">
                 ${data.features.map(feature => `
                     <div class="flex items-start">
-                        <div class="bg-indigo-100 text-indigo-800 rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center mr-4 text-2xl">${feature.icon}</div>
+                        <div class="bg-lime-100 text-lime-800 rounded-full h-10 w-10 flex-shrink-0 flex items-center justify-center mr-4 text-2xl">${feature.icon}</div>
                         <div>
                             <h4 class="font-semibold text-stone-800">${feature.title}</h4>
                             <p class="text-sm text-stone-600 leading-relaxed">${feature.content}</p>
@@ -607,10 +666,51 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Mobile Menu Toggle
+    const menuButton = document.getElementById('menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIconOpen = document.getElementById('menu-icon-open');
+    const menuIconClose = document.getElementById('menu-icon-close');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+    menuButton.addEventListener('click', () => {
+        const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+        menuButton.setAttribute('aria-expanded', !isExpanded);
+        mobileMenu.classList.toggle('hidden');
+        menuIconOpen.classList.toggle('hidden');
+        menuIconClose.classList.toggle('hidden');
+    });
+
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            menuButton.setAttribute('aria-expanded', 'false');
+            mobileMenu.classList.add('hidden');
+            menuIconOpen.classList.remove('hidden');
+            menuIconClose.classList.add('hidden');
+        });
+    });
+
     // Initial state
     updateTimeline(1);
     updateSegmentDetails(0);
     document.querySelector('.nav-link[href="#inicio"]').classList.add('active');
+
+    // Scroll Animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            } else {
+                // Optional: remove class when element is out of view
+                // entry.target.classList.remove('visible');
+            }
+        });
+    }, {
+        threshold: 0.1 // Trigger when 10% of the element is visible
+    });
+
+    const elementsToAnimate = document.querySelectorAll('.fade-in-up');
+    elementsToAnimate.forEach(el => observer.observe(el));
 
 });
 </script>
